@@ -273,7 +273,14 @@ module.exports = EntityGenerator.extend({
         if (this.relationships.length > 0) {
             this.log(chalk.white('Relationships'));
             this.relationships.forEach(function (relationship) {
-                this.log(chalk.red(relationship.relationshipName) + ' ' + chalk.white('(' + _.upperFirst(relationship.otherEntityName) + ')') + ' ' + chalk.cyan(relationship.relationshipType));
+            	var validationDetails = '';
+                var relationshipValidate = _.isArray(relationship.relationshipValidateRules) && relationship.relationshipValidateRules.length >= 1;
+                if (relationshipValidate === true) {
+                    if (relationship.relationshipValidateRules.indexOf('required') !== -1) {
+                        validationDetails = 'required ';
+                    }
+                }
+                this.log(chalk.red(relationship.relationshipName) + ' ' + chalk.white('(' + _.upperFirst(relationship.otherEntityName) + ')') + ' ' + chalk.cyan(relationship.relationshipType)+' ' + chalk.cyan(validationDetails));
             }, this);
             this.log();
         }
@@ -926,7 +933,7 @@ module.exports = EntityGenerator.extend({
             {
                 when: function (response) {
                     return response.relationshipAdd === true &&
-                        response.relationshipType === 'one-to-many';
+                        response.relationshipType === 'many-to-one';
                 },
                 type: 'confirm',
                 name: 'relationshipValidate',
@@ -937,7 +944,7 @@ module.exports = EntityGenerator.extend({
                 when: function (response) {
                     return response.relationshipAdd === true &&
                         response.relationshipValidate === true &&
-                        response.relationshipType === 'one-to-many';
+                        response.relationshipType === 'many-to-one';
                 },
                 type: 'checkbox',
                 name: 'relationshipValidateRules',
